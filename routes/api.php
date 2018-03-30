@@ -16,3 +16,10 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::middleware(['api'])->group(function () {
+    Route::get('field/list', 'Api\FieldController@list');
+    Route::post('field/add', 'Api\FieldController@create');
+    Route::put('field/update/{id}', 'Api\FieldController@update');
+    Route::delete('field/remove/{id}', 'Api\FieldController@remove');
+});

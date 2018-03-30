@@ -9,11 +9,11 @@ class SubscriberFieldValue extends Model
 {
     public function subscriber()
     {
-    	return $this->belongsTo('App\Subscriber', 'subscriber_id', 'id');
+        return $this->belongsTo('App\Subscriber', 'subscriber_id', 'id');
     }
 
     public function field()
     {
-    	return $this->belongsTo('App\UserFields', 'field_id')
+        return $this->belongsTo('App\UserFields', 'field_id')
     }
 }
