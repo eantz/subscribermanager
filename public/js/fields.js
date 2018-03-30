@@ -3369,7 +3369,11 @@ if (typeof window !== 'undefined' && window.Sweetalert2){  window.swal = window.
 var Swal = __webpack_require__("./node_modules/sweetalert2/dist/sweetalert2.all.js");
 
 function createFieldRow(field) {
-    var output = '<tr class="field-' + field.id + '">' + '<td class="field-row-title">' + field.title + '</td>' + '<td>' + field.type + '</td>' + '<td>' + field.name + '</td>' + '<td>' + '<a href="#" class="btn btn-warning btn-update-field" ' + 'data-id="' + field.id + '" data-title="' + field.title + '" ' + 'data-type="' + field.type + '" >edit</a>&nbsp;' + '<a href="#" class="btn btn-danger btn-remove-field" ' + 'data-id="' + field.id + '">remove</a>&nbsp;' + '</tr>';
+    var buttonEdit = field.user_id == null ? '' : '<a href="#" class="btn btn-warning btn-update-field" ' + 'data-id="' + field.id + '" data-title="' + field.title + '" ' + 'data-type="' + field.type + '" >edit</a>&nbsp;';
+
+    var buttonDelete = field.user_id == null ? '' : '<a href="#" class="btn btn-danger btn-remove-field" ' + 'data-id="' + field.id + '">remove</a>&nbsp;';
+
+    var output = '<tr class="field-' + field.id + '">' + '<td class="field-row-title">' + field.title + '</td>' + '<td>' + field.type + '</td>' + '<td>' + field.name + '</td>' + '<td>' + buttonEdit + buttonDelete + '</tr>';
 
     return output;
 }

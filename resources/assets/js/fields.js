@@ -1,16 +1,22 @@
 const Swal = require('sweetalert2');
 
 function createFieldRow(field) {
+    var buttonEdit = field.user_id == null ? '' : 
+                        '<a href="#" class="btn btn-warning btn-update-field" ' +
+                                'data-id="' + field.id + '" data-title="' + field.title + '" '+ 
+                                'data-type="' + field.type + '" >edit</a>&nbsp;';
+
+    var buttonDelete = field.user_id == null ? '' :
+                        '<a href="#" class="btn btn-danger btn-remove-field" ' +
+                                'data-id="' + field.id + '">remove</a>&nbsp;';
+
     var output = '<tr class="field-' + field.id + '">' +
                         '<td class="field-row-title">' + field.title + '</td>' + 
                         '<td>' + field.type + '</td>' + 
                         '<td>' + field.name + '</td>' + 
                         '<td>' + 
-                            '<a href="#" class="btn btn-warning btn-update-field" ' +
-                                'data-id="' + field.id + '" data-title="' + field.title + '" '+ 
-                                'data-type="' + field.type + '" >edit</a>&nbsp;' +
-                            '<a href="#" class="btn btn-danger btn-remove-field" ' +
-                                'data-id="' + field.id + '">remove</a>&nbsp;' +
+                            buttonEdit +
+                            buttonDelete +
                     '</tr>';
 
     return output;

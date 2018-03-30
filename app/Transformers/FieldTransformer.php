@@ -15,10 +15,11 @@ class FieldTransformer extends TransformerAbstract
     public function transform(UserField $field)
     {
         return [
-            'id'    => $field->id,
-            'title' => $field->title,
-            'type'  => ucwords($field->type),
-            'name'  => '{' . $field->name . '}'
+            'id'        => $field->id,
+            'user_id'   => $field->user_id,
+            'title'     => $field->title,
+            'type'      => ucwords($field->type),
+            'name'      => $field->placeholder
         ];
     }
 }

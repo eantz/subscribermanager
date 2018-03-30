@@ -17,7 +17,9 @@ class FieldController extends Controller
     {
         $user = Auth::guard('api')->user();
 
-        $fields = UserField::where('user_id', $user->id)
+        $fields = UserField::whereNull('user_id')
+                    ->orWhere('user_id', $user->id)
+                    ->orderBy('user_id', 'desc')
                     ->get();
 
         $fields = fractal($fields, new FieldTransformer())->toArray();
