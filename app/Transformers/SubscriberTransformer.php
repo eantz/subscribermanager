@@ -18,7 +18,7 @@ class SubscriberTransformer extends TransformerAbstract
             'id'        => $subscriber->id,
             'email'     => $subscriber->email,
             'name'      => $subscriber->name,
-            'subscriber'=> $subscriber->state
+            'state'     => $subscriber->state
         ];
     }
 }

@@ -17,9 +17,9 @@ class SubscriberFieldTransformer extends TransformerAbstract
         return [
             'id'            => $subscriberField->id,
             'field_id'      => $subscriberField->field->id,
-            'name'    => $subscriberField->field->name,
-            'title'   => $subscriberField->field->title,
-            'type'    => $subscriberField->field->type,
+            'name'          => $subscriberField->field->name,
+            'title'         => $subscriberField->field->title,
+            'type'          => $subscriberField->field->type,
             'value'         => $subscriberField->value
         ];
     }
