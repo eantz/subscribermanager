@@ -13,11 +13,11 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
+Route::post('auth/login', 'Api\AuthController@login');
 
 Route::middleware(['auth:api'])->group(function () {
+    Route::get('user', 'Api\UserController@show');
+
     Route::get('field/list', 'Api\FieldController@list');
     Route::post('field/add', 'Api\FieldController@create');
     Route::put('field/update/{id}', 'Api\FieldController@update');
