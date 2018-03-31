@@ -6,7 +6,7 @@ This repo is technical test material for backend developer position in MailerLit
 ## Installation
 
 * Download or clone this repository
-* Make sure your machine meets Laravel requirements as described [here] (https://laravel.com/docs/5.6/installation#server-requirements)
+* Make sure your machine meets Laravel requirements as described [here](https://laravel.com/docs/5.6/installation#server-requirements)
 * CD to the root folder of this application
 * run `composer install`
 * run `php artisan key:generate`
