@@ -28,16 +28,21 @@ This repo is technical test material for backend developer position in MailerLit
 
 ### API Authentication
 API call (except login) requires Basic Authorization. The Authorization token can be received by call login API first. From login API you will get `api_token` response that will be used as Authorization header.
+
 Example Authorization Header: `Authorization: Bearer randomstringtoken`
 
 ### login
 URL : `/api/auth/login`
+
 Type : **POST**
+
 Params : 
+
 Name | Type | Required
 ---- | ---- | --------
 email | String | yes
 password | String | yes
+
 Response :
 ```
 {
@@ -49,7 +54,9 @@ Response :
 
 ### List Fields
 URL: `api/field/list`
+
 Type: **GET**
+
 Response:
 ```
 {
@@ -70,12 +77,16 @@ Response:
 
 ### Create Field
 URL : `/api/field/create`
+
 Type : **POST**
+
 Params : 
+
 Name | Type | Required
 ---- | ---- | --------
 title | String | yes
 type | String (options: string, data, number, boolean) | yes
+
 Response :
 ```
 {
@@ -86,11 +97,15 @@ Response :
 
 ### Update Field
 URL : `/api/field/update/{field_id}`
+
 Type : **PUT**
+
 Params : 
+
 Name | Type | Required
 ---- | ---- | --------
 title | String | yes
+
 Response :
 ```
 {
@@ -101,7 +116,9 @@ Response :
 
 ### Remove Field
 URL : `/api/field/remove/{field_id}`
+
 Type : **DELETE**
+
 Response :
 ```
 {
@@ -112,8 +129,11 @@ Notes: Only field with user_id that can be removed
 
 
 ### List Subscriber
+
 URL: `api/subscriber/list`
+
 Type: **GET**
+
 Response:
 ```
 {
@@ -132,7 +152,9 @@ Response:
 
 ### Get Subscriber
 URL: `api/subscriber/show/{subscriber_id}`
+
 Type: **GET**
+
 Response:
 ```
 {
@@ -154,13 +176,17 @@ Response:
 
 ### Create Subscriber
 URL : `/api/subscriber/create`
+
 Type : **POST**
+
 Params : 
+
 Name | Type | Required
 ---- | ---- | --------
 email | String | yes
 name | String | yes
 other fields name | String | No
+
 Response :
 ```
 {
@@ -171,13 +197,17 @@ Response :
 
 ### Update Subscriber
 URL : `/api/subscriber/update/{subscriber_id}`
+
 Type : **PUT**
+
 Params : 
+
 Name | Type | Required
 ---- | ---- | --------
 email | String | yes
 name | String | yes
 other fields name | String | No
+
 Response :
 ```
 {
@@ -188,7 +218,9 @@ Response :
 
 ### Remove Subscriber
 URL : `/api/subscriber/remove/{subscriber_id}`
+
 Type : **DELETE**
+
 Response :
 ```
 {
