@@ -24,6 +24,12 @@ This repo is technical test material for backend developer position in MailerLit
 * You can now start managing Fields and Subscriber in the dashboard.
 
 
+## Run Unit Test
+
+* CD to the root folder of this application
+* run `./vendor/bin/phpunit`
+
+
 ## API usage
 
 ### API Authentication

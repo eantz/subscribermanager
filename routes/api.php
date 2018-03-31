@@ -19,7 +19,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('user', 'Api\UserController@show');
 
     Route::get('field/list', 'Api\FieldController@list');
-    Route::post('field/add', 'Api\FieldController@create');
+    Route::post('field/create', 'Api\FieldController@create');
     Route::put('field/update/{id}', 'Api\FieldController@update');
     Route::delete('field/remove/{id}', 'Api\FieldController@remove');
 

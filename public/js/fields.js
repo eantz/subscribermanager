@@ -3519,7 +3519,7 @@ $('.update-field-form').on('submit', function (e) {
             headers: {
                 'Authorization': 'Bearer ' + document.head.querySelector('meta[name="user-token"]').content
             },
-            url: '/api/field/add',
+            url: '/api/field/create',
             data: {
                 title: $('#field-title').val(),
                 type: $('#field-type').val()
