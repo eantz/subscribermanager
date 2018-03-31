@@ -13,7 +13,7 @@ function createFieldRow(field) {
     var output = '<tr class="field-' + field.id + '">' +
                         '<td class="field-row-title">' + field.title + '</td>' + 
                         '<td>' + field.type + '</td>' + 
-                        '<td>' + field.name + '</td>' + 
+                        '<td>' + field.placeholder + '</td>' + 
                         '<td>' + 
                             buttonEdit +
                             buttonDelete +

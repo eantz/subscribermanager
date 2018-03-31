@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\UserField;
+use App\SubscriberFieldValue;
+use DB;
 use Auth;
 use App\Transformers\FieldTransformer;
 use App\Http\Requests\CreateFieldRequest;
@@ -19,7 +21,7 @@ class FieldController extends Controller
 
         $fields = UserField::whereNull('user_id')
                     ->orWhere('user_id', $user->id)
-                    ->orderBy('user_id', 'desc')
+                    ->orderBy('user_id', 'asc')
                     ->get();
 
         $fields = fractal($fields, new FieldTransformer())->toArray();
@@ -58,8 +60,16 @@ class FieldController extends Controller
 
     public function remove(DeleteFieldRequest $request, $fieldId)
     {
+        DB::beginTransaction();
+
+        // remove subscriber field first 
+        SubscriberFieldValue::where('user_field_id', $fieldId)
+            ->delete();
+
         UserField::where('id', $fieldId)
             ->delete();
+
+        DB::commit();
 
         return response()->json(['status'=>true]);
     }

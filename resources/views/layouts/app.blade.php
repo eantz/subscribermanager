@@ -38,7 +38,7 @@
                     <!-- Left Side Of Navbar -->
                     <ul class="navbar-nav mr-auto">
                         <li><a class="nav-link" href="{{ route('fields') }}">Fields</a></li>
-                        <li><a class="nav-link" href="#">Subscribers</a></li>
+                        <li><a class="nav-link" href="{{ route('subscribers') }}">Subscribers</a></li>
                     </ul>
 
                     <!-- Right Side Of Navbar -->

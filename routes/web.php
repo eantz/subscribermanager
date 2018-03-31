@@ -21,4 +21,6 @@ Route::get('/home', 'HomeController@index')->name('home');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('fields', 'FieldController@index')->name('fields');
+
+    Route::get('subscribers', 'SubscriberController@index')->name('subscribers');
 });

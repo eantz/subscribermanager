@@ -12,6 +12,18 @@ class UserFieldsTableSeeder extends Seeder
     public function run()
     {
         DB::table('user_fields')->insert([
+            'name' => 'name',
+            'title'=> 'Name',
+            'type' => 'string'
+        ]);
+
+        DB::table('user_fields')->insert([
+            'name' => 'email',
+            'title'=> 'Email',
+            'type' => 'string'
+        ]);
+
+        DB::table('user_fields')->insert([
             'name' => 'last_name',
             'title'=> 'Last Name',
             'type' => 'string'

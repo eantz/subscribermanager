@@ -48,7 +48,7 @@ class CreateFieldRequest extends FormRequest
                                 ->where('name', $generatedName)
                                 ->first();
 
-            if($existingField) {
+            if ($existingField) {
                 $validator->errors()->add('title', 'Please use different title');
             }
         });

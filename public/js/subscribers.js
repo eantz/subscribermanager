@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "/";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 1);
+/******/ 	return __webpack_require__(__webpack_require__.s = 2);
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -3363,17 +3363,29 @@ if (typeof window !== 'undefined' && window.Sweetalert2){  window.swal = window.
 
 /***/ }),
 
-/***/ "./resources/assets/js/fields.js":
+/***/ "./resources/assets/js/subscribers.js":
 /***/ (function(module, exports, __webpack_require__) {
 
 var Swal = __webpack_require__("./node_modules/sweetalert2/dist/sweetalert2.all.js");
 
-function createFieldRow(field) {
-    var buttonEdit = field.user_id == null ? '' : '<a href="#" class="btn btn-warning btn-update-field" ' + 'data-id="' + field.id + '" data-title="' + field.title + '" ' + 'data-type="' + field.type + '" >edit</a>&nbsp;';
+function createSubscriberRow(subscriber) {
+    var buttonEdit = '<a href="#" class="btn btn-warning btn-update-subscriber" ' + 'data-id="' + subscriber.id + '" >edit</a>&nbsp;';
 
-    var buttonDelete = field.user_id == null ? '' : '<a href="#" class="btn btn-danger btn-remove-field" ' + 'data-id="' + field.id + '">remove</a>&nbsp;';
+    var buttonDelete = '<a href="#" class="btn btn-danger btn-remove-subscriber" ' + 'data-id="' + subscriber.id + '">remove</a>&nbsp;';
 
-    var output = '<tr class="field-' + field.id + '">' + '<td class="field-row-title">' + field.title + '</td>' + '<td>' + field.type + '</td>' + '<td>' + field.placeholder + '</td>' + '<td>' + buttonEdit + buttonDelete + '</tr>';
+    var output = '<tr class="subscriber-' + subscriber.id + '">' + '<td class="subscriber-row-email">' + subscriber.email + '</td>' + '<td class="subscriber-row-name">' + subscriber.name + '</td>' + '<td>' + buttonEdit + buttonDelete + '</tr>';
+
+    return output;
+}
+
+function createFormInput(field) {
+    var inputType = field.type.toLowerCase();
+
+    if (inputType == 'boolean') {
+        var output = '<div class="form-group">' + '<div class="form-check">' + '<input class="form-check-input" type="checkbox" value="1" ' + 'id="subscriber-' + field.name + '" ' + 'name="' + field.name + '" ' + (field.value == '1' ? 'checked="checked" ' : '') + '>' + '<label class="form-check-label" for="subscriber-' + field.name + '">' + field.title + '</label>' + '</div>' + '</div>';
+    } else {
+        var output = '<div class="form-group">' + '<label class="form-label" for="subscriber-' + field.name + '">' + field.title + '</label>' + '<input type="' + (inputType == 'number' ? 'number' : 'text') + '" ' + 'class="form-control" name="' + field.name + '" ' + 'id="subscriber-' + field.name + '" value="' + (field.value != undefined ? field.value : '') + '">' + '</div>';
+    }
 
     return output;
 }
@@ -3399,34 +3411,36 @@ function processErrorFromAjax(jqXhr) {
 
 $.ajax({
     type: 'GET',
-    url: '/api/field/list',
+    url: '/api/subscriber/list',
     headers: {
         'Authorization': 'Bearer ' + document.head.querySelector('meta[name="user-token"]').content
     },
     success: function success(data) {
         var output = '';
-        fields = data.fields;
-        for (i = 0; i < fields.length; i++) {
-            output += createFieldRow(fields[i]);
+        subscribers = data.subscribers;
+        for (i = 0; i < subscribers.length; i++) {
+            output += createSubscriberRow(subscribers[i]);
         }
 
-        $('.table-fields tbody').html(output);
+        console.log(output);
+
+        $('.table-subscribers tbody').html(output);
     }
 });
 
-$(document).on('click', '.btn-update-field', function (e) {
+$(document).on('click', '.btn-add-subscriber', function (e) {
     e.preventDefault();
 
-    $('.modal-update-field').modal('show', $(e.target));
+    $('.modal-update-subscriber').modal('show', $(e.target));
 });
 
-$(document).on('click', '.btn-add-field', function (e) {
+$(document).on('click', '.btn-update-subscriber', function (e) {
     e.preventDefault();
 
-    $('.modal-update-field').modal('show', $(e.target));
+    $('.modal-update-subscriber').modal('show', $(e.target));
 });
 
-$(document).on('click', '.btn-remove-field', function (e) {
+$(document).on('click', '.btn-remove-subscriber', function (e) {
     e.preventDefault();
 
     var data_id = $(this).data('id');
@@ -3443,9 +3457,9 @@ $(document).on('click', '.btn-remove-field', function (e) {
                 headers: {
                     'Authorization': 'Bearer ' + document.head.querySelector('meta[name="user-token"]').content
                 },
-                url: '/api/field/remove/' + data_id,
+                url: '/api/subscriber/remove/' + data_id,
                 success: function success(data) {
-                    $('.field-' + data_id).remove();
+                    $('.subscriber-' + data_id).remove();
                 },
                 error: function error(jqXhr, textStatus, errorThrown) {
                     processErrorFromAjax(jqXhr);
@@ -3455,81 +3469,96 @@ $(document).on('click', '.btn-remove-field', function (e) {
     });
 });
 
-$('.modal-update-field').on('show.bs.modal', function (e) {
+$('.modal-update-subscriber').on('show.bs.modal', function (e) {
     var button = $(e.relatedTarget);
     var data_id = button.data('id');
-    var data_title = button.data('title');
-    var data_type = button.data('type');
+
+    console.log(data_id);
 
     var modal = $(this);
 
-    if (data_id != undefined) {
-        modal.find('#field-id').val(data_id);
-        modal.find('#field-title').val(data_title);
-        modal.find('#field-type').val(data_type.toLowerCase()).attr('disabled', 'disabled');
-
-        modal.find('.modal-title').text('Update Field');
-    } else {
-        modal.find('.modal-title').text('Add Field');
-    }
-});
-
-$('.modal-update-field').on('hide.bs.modal', function () {
-    var modal = $(this);
-
-    modal.find('#field-id').val('');
-    modal.find('#field-title').val('');
-    modal.find('#field-type').val('string').removeAttr('disabled');
-});
-
-$('.update-field-form').on('submit', function (e) {
-    e.preventDefault();
-
-    var data_id = $('#field-id').val();
-    var data_title = $('#field-title').val();
-    var data_type = $('#field-type').val();
-
-    if (data_id > 0) {
-        // update
+    if (data_id == undefined) {
         $.ajax({
-            type: 'PUT',
+            type: 'GET',
+            url: '/api/field/list',
             headers: {
                 'Authorization': 'Bearer ' + document.head.querySelector('meta[name="user-token"]').content
             },
-            url: '/api/field/update/' + data_id,
-            data: {
-                title: $('#field-title').val()
+            success: function success(data) {
+                var output = '';
+                fields = data.fields;
+                for (i = 0; i < fields.length; i++) {
+                    output += createFormInput(fields[i]);
+                }
+
+                modal.find('.modal-body').append(output);
+            }
+        });
+    } else {
+        $.ajax({
+            type: 'GET',
+            url: '/api/subscriber/show/' + data_id,
+            headers: {
+                'Authorization': 'Bearer ' + document.head.querySelector('meta[name="user-token"]').content
             },
             success: function success(data) {
-                var field = data.field;
-                var fieldRow = $('.field-' + field.id);
+                var output = '<input type="hidden" name="id" value="' + data_id + '">';
+                fields = data.fields;
+                for (i = 0; i < fields.length; i++) {
+                    output += createFormInput(fields[i]);
+                }
 
-                fieldRow.find('.field-row-title').text(field.title);
+                modal.find('.modal-body').append(output);
+            }
+        });
+    }
+});
 
-                $('.modal-update-field').modal('hide');
+$('.modal-update-subscriber').on('hide.bs.modal', function () {
+    $(this).find('.modal-body').html('');
+});
+
+$('.update-subscriber-form').on('submit', function (e) {
+    e.preventDefault();
+
+    var form = $(this);
+
+    if (form.find('input[name="id"]').length <= 0) {
+        $.ajax({
+            type: 'POST',
+            url: '/api/subscriber/create',
+            headers: {
+                'Authorization': 'Bearer ' + document.head.querySelector('meta[name="user-token"]').content
+            },
+            data: form.serialize(),
+            success: function success(data) {
+                row = createSubscriberRow(data.subscriber);
+
+                $(row).appendTo('.table-subscribers tbody');
+
+                $('.modal-update-subscriber').modal('hide');
             },
             error: function error(jqXhr, textStatus, errorThrown) {
                 processErrorFromAjax(jqXhr);
             }
         });
     } else {
-        // add
+        var data_id = form.find('input[name="id"]').val();
+
         $.ajax({
-            type: 'POST',
+            type: 'PUT',
+            url: '/api/subscriber/update/' + data_id,
             headers: {
                 'Authorization': 'Bearer ' + document.head.querySelector('meta[name="user-token"]').content
             },
-            url: '/api/field/add',
-            data: {
-                title: $('#field-title').val(),
-                type: $('#field-type').val()
-            },
+            data: form.serialize(),
             success: function success(data) {
-                output = createFieldRow(data.field);
+                row = $('.subscriber-' + data_id);
 
-                $(output).appendTo('.table-fields tbody');
+                row.find('.subscriber-row-name').text(data.subscriber.name);
+                row.find('.subscriber-row-email').text(data.subscriber.email);
 
-                $('.modal-update-field').modal('hide');
+                $('.modal-update-subscriber').modal('hide');
             },
             error: function error(jqXhr, textStatus, errorThrown) {
                 processErrorFromAjax(jqXhr);
@@ -3540,10 +3569,10 @@ $('.update-field-form').on('submit', function (e) {
 
 /***/ }),
 
-/***/ 1:
+/***/ 2:
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__("./resources/assets/js/fields.js");
+module.exports = __webpack_require__("./resources/assets/js/subscribers.js");
 
 
 /***/ })

@@ -14,6 +14,6 @@ class SubscriberFieldValue extends Model
 
     public function field()
     {
-        return $this->belongsTo('App\UserFields', 'field_id')
+        return $this->belongsTo('App\UserField', 'user_field_id', 'id');
     }
 }
