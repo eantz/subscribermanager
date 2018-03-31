@@ -233,3 +233,11 @@ Response :
     status: true
 }
 ```
+
+
+## About Verifying Email Address
+
+Unfortunately I can't make email verifier work. I failed when I try to connect to the email server. Even I tried from 2 different ubuntu server, but it always timed out. Still not sure how to configure it properly.
+
+So, the email verifier will just check if the host has MX records at this moment. 
+

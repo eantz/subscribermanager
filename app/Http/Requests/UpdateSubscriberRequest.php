@@ -6,6 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Auth;
 use App\Subscriber;
 use App\UserField;
+use App\Libraries\VerifyEmail;
 
 class UpdateSubscriberRequest extends FormRequest
 {
@@ -61,15 +62,12 @@ class UpdateSubscriberRequest extends FormRequest
             $email = request()->input('email');
 
             if($email != '') {
-                // // check email active
-                // $verifier = new VerifyEmail;
-                // $verifier->setStreamTimeoutWait(60);
-                // $verifier->Debug = true;
-                // $verifier->setEmailFrom('destiya.dian@gmail.com');
+                // check email active
+                $verifier = new VerifyEmail;
 
-                // if (!$verifier->check($email)) {
-                //     $validator->errors()->add('email', 'Email does not exist');
-                // }
+                if (!$verifier->isValidEmail($email)) {
+                    $validator->errors()->add('email', 'Email does not exist');
+                }
 
                 // check email already subscribed
                 $subscriberExist = Subscriber::where('email', $email)
