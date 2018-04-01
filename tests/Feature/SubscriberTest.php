@@ -16,8 +16,6 @@ class SubscriberTest extends TestCase
     {
         parent::setUp();
 
-        DB::beginTransaction();
-
         $user = new User;
         $user->name = 'Aliando';
         $user->email = 'aliando@gmail.com';
@@ -148,10 +146,5 @@ class SubscriberTest extends TestCase
         $response->assertStatus(200);
 
         $this->assertTrue($responseData['status']);
-    }
-
-    public function tearDown()
-    {
-        DB::rollback();
     }
 }

@@ -17,8 +17,6 @@ class FieldTest extends TestCase
     {
         parent::setUp();
 
-        DB::beginTransaction();
-
         $user = new User;
         $user->name = 'Aliando';
         $user->email = 'aliando@gmail.com';
@@ -135,10 +133,5 @@ class FieldTest extends TestCase
 
         $this->assertEquals($responseData['fields'][count($responseData['fields']) - 1]['id'], 
             $responseDataCreate['field']['id']);
-    }
-
-    public function tearDown()
-    {
-        DB::rollback();
     }
 }

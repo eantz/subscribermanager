@@ -17,8 +17,6 @@ class AuthTest extends TestCase
     {
         parent::setUp();
 
-        DB::beginTransaction();
-
         DB::table('users')->insert([
             'name' => 'Aliando',
             'email' => 'aliando@gmail.com',
@@ -47,10 +45,5 @@ class AuthTest extends TestCase
             ->assertJsonFragment([
                 'email' => 'aliando@gmail.com',
             ]);
-    }
-
-    public function tearDown()
-    {
-        DB::rollback();
     }
 }
