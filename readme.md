@@ -37,6 +37,9 @@ API call (except login) requires Basic Authorization. The Authorization token ca
 
 Example Authorization Header: `Authorization: Bearer randomstringtoken`
 
+### Notes on Using Postman
+Make sure to specify header `X-Requested-With` with value `XMLHttpRequest` to force Laravel return json instead of redirect when running validation.
+
 ### login
 URL : `/api/auth/login`
 

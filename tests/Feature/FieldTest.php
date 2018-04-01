@@ -12,126 +12,103 @@ use DB;
 class FieldTest extends TestCase
 {
     protected $currentUser;
+    protected $newField;
+
+    protected $authorizationHeader;
 
     public function setUp()
     {
         parent::setUp();
 
-        $user = new User;
-        $user->name = 'Aliando';
-        $user->email = 'aliando@gmail.com';
-        $user->password = bcrypt('secret');
-        $user->api_token = str_random(100);
-        $user->save();
+        $this->currentUser = factory(User::class)->create();
+        $this->newField = factory(UserField::class)->create();
 
-        $this->currentUser = $user;
+        $this->authorizationHeader = ['Authorization' => 'Bearer ' . $this->currentUser->api_token];
     }
 
     public function testFieldList()
     {
-        $response = $this->withHeaders([
-                        'Authorization' => 'Bearer ' . $this->currentUser->api_token
+        $response = $this->withHeaders($this->authorizationHeader)
+                    ->json('GET', '/api/field/list')
+                    ->assertStatus(200)
+                    ->assertJsonStructure([
+                        'fields' => [
+                            '*' => [
+                                'id',
+                                'user_id',
+                                'title',
+                                'type',
+                                'placeholder'
+                            ]
+                        ]
                     ])
-                    ->json('GET', '/api/field/list');
+                    ->decodeResponseJson();
 
-        $responseData = $response->original;
-
-        $response->assertStatus(200)
-            ->assertJsonFragment(['fields']);
-
-        $this->assertEquals($responseData['fields'][0]['user_id'], null);
+        $this->assertEquals($response['fields'][0]['user_id'], null);
     }
 
     public function testCreateField()
     {
-        $response = $this->withHeaders([
-                        'Authorization' => 'Bearer ' . $this->currentUser->api_token
-                    ])
+        $response = $this->withHeaders($this->authorizationHeader)
                     ->json('POST', '/api/field/create', [
                         'title' => 'Your Current City',
                         'type' => 'string'
-                    ]);
+                    ])
+                    ->assertStatus(200)
+                    ->assertJsonStructure([
+                        'field' => [
+                            'id',
+                            'user_id',
+                            'title',
+                            'type',
+                            'placeholder'
+                        ]
+                    ])
+                    ->decodeResponseJson();
 
-        $responseData = $response->original;
-
-        $response->assertStatus(200);
-
-        $this->assertEquals($responseData['field']['name'], 'your_current_city');
+        $this->assertEquals($response['field']['name'], 'your_current_city');
     }
 
     public function testUpdateField()
     {
-        $responseCreate = $this->withHeaders([
-                        'Authorization' => 'Bearer ' . $this->currentUser->api_token
-                    ])
-                    ->json('POST', '/api/field/create', [
-                        'title' => 'Your Current City',
-                        'type' => 'string'
-                    ]);
+        $this->newField->user_id = $this->currentUser->id;
+        $this->newField->save();
 
-        $responseDataCreate = $responseCreate->original;
-
-        $response = $this->withHeaders([
-                        'Authorization' => 'Bearer ' . $this->currentUser->api_token
-                    ])
-                    ->json('PUT', '/api/field/update/' . $responseDataCreate['field']['id'], [
+        $response = $this->withHeaders($this->authorizationHeader)
+                    ->json('PUT', '/api/field/update/' . $this->newField->id, [
                         'title' => 'Your Current Country',
-                    ]);
+                    ])
+                    ->assertStatus(200)
+                    ->decodeResponseJson();
 
-        $responseData = $response->original;
-
-        $response->assertStatus(200);
-
-        $this->assertEquals($responseData['field']['name'], 'your_current_city');
+        $this->assertEquals($response['field']['name'], $this->newField->name);
     }
 
 
     public function testRemoveField()
     {
-        $responseCreate = $this->withHeaders([
-                        'Authorization' => 'Bearer ' . $this->currentUser->api_token
-                    ])
-                    ->json('POST', '/api/field/create', [
-                        'title' => 'Your Current City',
-                        'type' => 'string'
-                    ]);
+        $this->newField->user_id = $this->currentUser->id;
+        $this->newField->save();
 
-        $responseDataCreate = $responseCreate->original;
+        $response = $this->withHeaders($this->authorizationHeader)
+                    ->json('DELETE', '/api/field/remove/' . $this->newField->id)
+                    ->assertStatus(200)
+                    ->decodeResponseJson();
 
-        $response = $this->withHeaders([
-                        'Authorization' => 'Bearer ' . $this->currentUser->api_token
-                    ])
-                    ->json('DELETE', '/api/field/remove/' . $responseDataCreate['field']['id']);
-
-        $responseData = $response->original;
-
-        $response->assertStatus(200);
-
-        $this->assertTrue($responseData['status']);
+        $this->assertTrue($response['status']);
     }
 
     public function testUserFieldInFieldList()
     {
-        $responseCreate = $this->withHeaders([
-                        'Authorization' => 'Bearer ' . $this->currentUser->api_token
-                    ])
-                    ->json('POST', '/api/field/create', [
-                        'title' => 'Your Current City',
-                        'type' => 'string'
-                    ]);
+        $this->newField->user_id = $this->currentUser->id;
+        $this->newField->save();
 
-        $responseDataCreate = $responseCreate->original;
+        $response = $this->withHeaders($this->authorizationHeader)
+                    ->json('GET', '/api/field/list')
+                    ->assertStatus(200)
+                    ->decodeResponseJson();
 
-        $response = $this->withHeaders([
-                        'Authorization' => 'Bearer ' . $this->currentUser->api_token
-                    ])
-                    ->json('GET', '/api/field/list');
-
-        $responseData = $response->original;
-
-        $response->assertStatus(200);
-
-        $this->assertEquals($responseData['fields'][count($responseData['fields']) - 1]['id'], 
-            $responseDataCreate['field']['id']);
+        $this->assertEquals($response['fields'][count($response['fields']) - 1]['id'], 
+            $this->newField->id);
     }
 }

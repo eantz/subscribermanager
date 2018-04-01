@@ -11,39 +11,42 @@ use DB;
 
 class AuthTest extends TestCase
 {
-    protected $initialized = false;
+    protected $newUser;
 
     public function setUp()
     {
         parent::setUp();
 
-        DB::table('users')->insert([
-            'name' => 'Aliando',
-            'email' => 'aliando@gmail.com',
-            'password' => bcrypt('secret'),
-            'api_token' => str_random(100)
-        ]);
+        $this->newUser = factory(User::class)->create();
     }
     
     public function testLoginFailed()
     {
-        $this->assertInvalidCredentials([
-            'email' => 'aliando@gmail.com',
+        $response = $this->json('POST', '/api/auth/login', [
+            'email' => $this->newUser->email,
             'password' => 'wrongpassword'
-        ], 'api');
+        ]);
+
+        $response->assertStatus(422);
     }
 
     public function testLoginSuccess()
     {
         $response = $this->json('POST', '/api/auth/login', [
-            'email' => 'aliando@gmail.com',
+            'email' => $this->newUser->email,
             'password' => 'secret'
         ]);
 
         $response
             ->assertStatus(200)
+            ->assertJsonStructure([
+                '*' => [
+                    'email',
+                    'api_token'
+                ]
+            ])
             ->assertJsonFragment([
-                'email' => 'aliando@gmail.com',
+                'email' => $this->newUser->email,
             ]);
     }
 }
