@@ -19,7 +19,7 @@ This repo is technical test material for backend developer position at MailerLit
 
 ## Using the Application
 
-* After you open the application, click on Login link in navbar
+* After opening the application, click on Login link in navbar
 * Login using email : `john.doe@gmail.com` and password : `secret`
 * You can now start managing Fields and Subscriber in the dashboard.
 
@@ -33,14 +33,15 @@ This repo is technical test material for backend developer position at MailerLit
 ## API usage
 
 ### API Authentication
-API call (except login) requires Basic Authorization. The Authorization token can be received by call login API first. From login API you will get `api_token` response that will be used as Authorization header.
+API call (except login) requires Basic Authorization. The Authorization token can be received by calling login API. Login API will return `api_token` response that will be used as Authorization header.
 
 Example Authorization Header: `Authorization: Bearer randomstringtoken`
 
 ### Notes on Using Postman
 Make sure to specify header `X-Requested-With` with value `XMLHttpRequest` to force Laravel return json instead of redirect when running validation.
 
-### login
+
+### Login
 URL : `/api/auth/login`
 
 Type : **POST**
@@ -72,7 +73,7 @@ Response:
     fields: [
         {
             id: 4, // int
-            user_id: 1 // int or null
+            user_id: 1 // int or null, null means it's a default field from the system (cannot be removed or updated)
             title: 'Name',
             type: 'String', // String, Date, Boolean, Number
             name: 'name',
@@ -139,7 +140,7 @@ Notes: Only field with user_id that can be removed
 
 ### List Subscriber
 
-URL: `api/subscriber/list`
+URL: `/api/subscriber/list`
 
 Type: **GET**
 
@@ -160,7 +161,7 @@ Response:
 
 
 ### Get Subscriber
-URL: `api/subscriber/show/{subscriber_id}`
+URL: `/api/subscriber/show/{subscriber_id}`
 
 Type: **GET**
 
@@ -245,13 +246,21 @@ Type : **POST**
 
 Response : 
 ```
+{
     subscriber: // identical to single subscriber in subscriber list API
+}
 ```
+
+
+### Response Codes
+Code | Description
+---- | -----------
+200 | OK
+403 | Forbidden, usually if a user want to change asset of another user
+422 | Validation Error. This will return response `{ errors: { field_name : ['error a', 'error b'] } }`
 
 
 ## About Verifying Email Address
 
-Unfortunately I can't make email verifier work. I failed when I try to connect to the email server. Even I tried from 2 different ubuntu server, but it always timed out. Still not sure how to configure it properly.
-
-So, the email verifier will just check if the host has MX records at this moment. 
+Email address verificator will check if MX records exist for the specified domain. Unfortunately, at this moment I can't go beyond this step to make verificator also check if email is active. Maybe I missed specific configuration on server side or even on DNS side.
 
