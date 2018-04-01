@@ -27,5 +27,6 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('subscriber/show/{id}', 'Api\SubscriberController@show');
     Route::post('subscriber/create', 'Api\SubscriberController@create');
     Route::put('subscriber/update/{id}', 'Api\SubscriberController@update');
+    Route::post('subscriber/unsubscribe/{id}', 'Api\SubscriberController@unsubscribe');
     Route::delete('subscriber/remove/{id}', 'Api\SubscriberController@remove');
 });

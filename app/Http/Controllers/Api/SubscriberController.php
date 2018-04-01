@@ -135,4 +135,16 @@ class SubscriberController extends Controller
 
         return response()->json(['status' => true]);
     }
+
+    public function unsubscribe(ShowSubscriberRequest $request, $subscriberId)
+    {
+        $subscriber = Subscriber::find($subscriberId);
+
+        $subscriber->state = Subscriber::STATE_UNSUBSCRIBED;
+        $subscriber->save();
+
+        $subscriber = fractal($subscriber, new SubscriberTransformer())->toArray();
+
+        return response()->json(['subscriber' => $subscriber['data']]);
+    }
 }

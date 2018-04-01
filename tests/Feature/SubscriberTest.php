@@ -7,6 +7,7 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use DB;
 use App\User;
+use App\Subscriber;
 
 class SubscriberTest extends TestCase
 {
@@ -124,7 +125,7 @@ class SubscriberTest extends TestCase
         $this->assertEquals($response['subscriber']['name'], 'Jennifer');
     }
 
-    public function testRemoveSubscriber($value='')
+    public function testRemoveSubscriber()
     {
         $responseCreate = $this->withHeaders($this->authorizationHeader)
                     ->json('POST', '/api/subscriber/create', [
@@ -138,5 +139,21 @@ class SubscriberTest extends TestCase
                     ->decodeResponseJson();
 
         $this->assertTrue($response['status']);
+    }
+
+    public function testUnsubscribe()
+    {
+        $responseCreate = $this->withHeaders($this->authorizationHeader)
+                    ->json('POST', '/api/subscriber/create', [
+                        'email' => 'jane.shalimar@gmail.com',
+                        'name' => 'Jane Shalimar'
+                    ])->decodeResponseJson();
+
+        $response = $this->withHeaders($this->authorizationHeader)
+                    ->json('POST', '/api/subscriber/unsubscribe/' . $responseCreate['subscriber']['id'])
+                    ->assertStatus(200)
+                    ->decodeResponseJson();
+
+        $this->assertEquals($response['subscriber']['state'], Subscriber::STATE_UNSUBSCRIBED);
     }
 }

@@ -199,7 +199,7 @@ other fields name | String | No
 Response :
 ```
 {
-    field: // identical to single subscriber in subscriber list API
+    subscriber: // identical to single subscriber in subscriber list API
 }
 ```
 
@@ -220,7 +220,7 @@ other fields name | String | No
 Response :
 ```
 {
-    field: // identical to single subscriber in subscriber list API
+    subscriber: // identical to single subscriber in subscriber list API
 }
 ```
 
@@ -235,6 +235,17 @@ Response :
 {
     status: true
 }
+```
+
+
+### Unsubscribe Subscriber
+URL: `/api/subscriber/unsubscribe/{subscriber_id}`
+
+Type : **POST**
+
+Response : 
+```
+    subscriber: // identical to single subscriber in subscriber list API
 ```
 
 
