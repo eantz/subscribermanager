@@ -1,6 +1,6 @@
 # Subscriber Manager
 
-This repo is technical test material for backend developer position in MailerLite
+This repo is technical test material for backend developer position at MailerLite
 
 
 ## Installation

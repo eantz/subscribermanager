@@ -2,96 +2,109 @@
 
 namespace App\Libraries;
 
+/**
+ * Based on http://www.webtrafficexchange.com/smtp-email-address-validation
+ */
 class VerifyEmail { 
 
-    // http://www.phpwala.in/php/how-to-check-if-an-email-address-is-real-or-not-php/2018/01
-    function isValidEmail($email){
-        $result=false;
+    private $options = array(
+            "port" => 25,
+            "timeout" => 1,  // Connection timeout to remote mail server.
+            "sender" => "hello@destiyadian.com",
+            "short_response" => true,
+            'mx_validation_only' => false
+    );
+     
+    /**
+     *  Override the options for those specified.
+     */
+    function __construct($options = null) {
+        if (!empty($options)) {
+            if (is_array($options)) {
+                foreach ($options as $key => $value) {
+                    $this->options[$key] = $value;
+                }
+            }
+        }
+    }
+     
+    /**
+     *  Validate the email address via SMTP.
+     *  If 'short_response' is true, the method will return true or false;
+     *  Otherwise, the entire array of useful information will be provided.
+     */
+    public function validate($email) 
+    {
+        $result = array("valid" => false);
+        $errors = array();
+        $mxhosts = [];
+         
+        // Email address (format) validation
+        if (empty($email)) {
+            $errors = array("Email address is required.\n");
+        } else if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $errors = array("Invalid email address.\n");
+        } else {
+            list($username, $hostname) = explode('@', $email);
+            if (function_exists('getmxrr')) {
+                if (getmxrr($hostname, $mxhosts, $mxweights)) {
+                    $result['mx_records'] = array_combine($mxhosts, $mxweights);
+                    asort($result['mx_records']);
+                } else {
+                    $errors = "No MX record found.";
+                }
+            }
 
-        //check valid MX record
-        list($name, $domain)=explode('@',$email);
+            if ($this->options['mx_validation_only']) {
+                if (count($mxhosts) > 0) {
+                    $result['valid'] = true;
+                }
+            } else {
 
-        if(!checkdnsrr($domain,'MX'))
-            return $result;
-
-        //check SMTP query
-        $max_conn_time = 30;
-        $sock='';
-        $port = 25;
-        $max_read_time = 5;
-        $users = $name;
-        $hosts = array();
-        $mxweights = array();
-
-        getmxrr($domain, $hosts, $mxweights);
-        $mxs = array_combine($hosts, $mxweights);
-
-        if(count($mxs) > 0) {
-            return true;
+                foreach ($mxhosts as $host) {
+                    $fp = @fsockopen($host, $this->options['port'], $errno, $errstr, 
+                                           $this->options['timeout']);
+                    if ($fp) {
+                        $data = fgets($fp);
+                        $code = substr($data, 0, 3);
+                        if ($code == '220') {
+                            $sender_domain = explode('@', $this->options['sender']);
+                            fwrite($fp, "HELO {$sender_domain[0]}\r\n");
+                            fread($fp, 4096);
+                            fwrite($fp, "MAIL FROM: <{$this->options['sender']}>\r\n");
+                            fgets($fp);
+                            fwrite($fp, "RCPT TO:<{$email}>\r\n");
+                            $data = fgets($fp);
+                            $code = substr($data, 0, 3);
+                            $result['response'] = array("code" => $code, "data" => $data);
+                            fwrite($fp, "quit\r\n");
+                            fclose($fp);
+                            switch ($code) {
+                                case "250":  // We're good, so exit out of foreach loop
+                                case "421":  // Too many SMTP connections
+                                case "450":
+                                case "451":  // Graylisted
+                                case "452":
+                                    $result['valid'] = true;
+                                    break 2;  // Assume 4xx return code is valid.
+                                default:
+                                    $errors[] = "({$host}) RCPT TO: {$code}: {$data}\n";
+                            }
+                        } else {
+                            $errors[] = "MTA Error: (Stream: {$data})\n";
+                        }
+                    } else {
+                        $errors[] = "{$errno}: $errstr\n";
+                    }
+                }
+            }
+     
         }
 
-        // asort($mxs, SORT_NUMERIC);
+        if (!empty($errors)) {
+            $result['errors'] = $errors;
+        }
 
-        // $mxs[$domain] = 100;
-        // $timeout = $max_conn_time / count($mxs);
-
-
-
-        // //try to check each host
-        // foreach ($mxs as $host => $priority) {
-        //     #connect to SMTP server
-        //     if ($sock = fsockopen($host, $port, $errno, $errstr, (float) $timeout)){
-        //         stream_set_timeout($sock, $max_read_time);
-        //         break;
-        //     }
-        // }
-
-        // //get TCP socket
-        // if ($sock) {
-        //     $reply = fread($sock, 2082);
-        //     preg_match('/^([0-9]{3}) /ims', $reply, $matches);
-        //     $code = isset($matches[1]) ? $matches[1] : '';
-
-        //     if ($code != '220') {
-        //         return $result;
-        //     }
-
-        //     //initial SMTP connection
-        //     $msg = "HELO ".$domain;
-        //     fwrite($sock, $msg."\r\n");
-        //     $reply = fread($sock, 2082);
-
-        //     //sender call
-        //     $msg = "MAIL FROM: <".$name.'@'.$domain.">";
-        //     fwrite($sock, $msg."\r\n");
-        //     $reply = fread($sock, 2082);
-
-        //     //ask to receiver
-        //     $msg = "RCPT TO: <".$name.'@'.$domain.">";
-        //     fwrite($sock, $msg."\r\n");
-        //     $reply = fread($sock, 2082);
-
-        //     //get response
-        //     preg_match('/^([0-9]{3}) /ims', $reply, $matches);
-        //     $code = isset($matches[1]) ? $matches[1] : '';
-
-        //     if ($code == '250') {
-        //         // email address accepted : 250
-        //         $result=true;
-        //     } elseif ($code == '451' || $code == '452') {
-        //         //email address greylisted : 451
-        //         $result=true;
-        //     } else {
-        //         $result=false;
-        //     }
-
-        //     //quit SMTP connection
-        //     $msg = "quit";
-        //     fwrite($sock, $msg."\r\n");
-
-        //     //close socket
-        //     fclose($sock);
-        // }
-        // return $result;
+        return ($this->options['short_response']) ? $result['valid'] : $result;
     }
 }

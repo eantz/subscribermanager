@@ -61,9 +61,9 @@ class CreateSubscriberRequest extends FormRequest
 
             if($email != '') {
                 // check email active
-                $verifier = new VerifyEmail;
+                $verifier = new VerifyEmail(['mx_validation_only'=>true]);
 
-                if (!$verifier->isValidEmail($email)) {
+                if (!$verifier->validate($email)) {
                     $validator->errors()->add('email', 'Email does not exist');
                 }
 
